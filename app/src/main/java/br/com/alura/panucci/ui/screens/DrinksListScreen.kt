@@ -46,7 +46,7 @@ fun DrinksListScreen(
             columns = StaggeredGridCells.Fixed(columns),
             Modifier.fillMaxSize(),
             contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            verticalItemSpacing = 16.dp,
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(products) { p ->

@@ -14,6 +14,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
 import br.com.alura.panucci.sampledata.bottomAppBarItems
 import br.com.alura.panucci.sampledata.sampleProductWithImage
 import br.com.alura.panucci.sampledata.sampleProducts
@@ -22,16 +23,20 @@ import br.com.alura.panucci.ui.components.PanucciBottomAppBar
 import br.com.alura.panucci.ui.screens.*
 import br.com.alura.panucci.ui.theme.PanucciTheme
 
+private const val TAG = "MainActivity"
+
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            val navController = rememberNavController()
+            Log.i(TAG, "onCreate: navControler $navController")
             val initialScreen = "Destaques"
             val screens = remember {
                 mutableStateListOf(initialScreen)
             }
-            Log.i("MainActivity", "onCreate: screens ${screens.toList()}")
+            Log.i(TAG, "onCreate: screens ${screens.toList()}")
             val currentScreen = screens.last()
             BackHandler(screens.size > 1) {
                 screens.removeLast()
