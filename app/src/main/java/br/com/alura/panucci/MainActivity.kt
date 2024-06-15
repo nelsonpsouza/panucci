@@ -29,10 +29,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val navController = rememberNavController()
-            LaunchedEffect(Unit) {
-                delay(3000L)
-                navController.navigate("menu")
-            }
             PanucciTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -46,18 +42,23 @@ class MainActivity : ComponentActivity() {
                         bottomAppBarItemSelected = selectedItem,
                         onBottomAppBarItemSelectedChange = {
                             selectedItem = it
+                            val route = it.route
+                            navController.navigate(route)
                         },
                         onFabClick = {
                         }) {
                         NavHost(
                             navController = navController,
-                            startDestination = "home"
+                            startDestination = "highlight"
                         ){
-                            composable("home") {
+                            composable("highlight") {
                                 HighlightsListScreen(products = sampleProducts)
                             }
                             composable("menu") {
                                 MenuListScreen(products = sampleProducts)
+                            }
+                            composable("drinks") {
+                                DrinksListScreen(products = sampleProducts)
                             }
                         }
                     }
