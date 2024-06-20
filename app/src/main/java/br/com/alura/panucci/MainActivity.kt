@@ -9,22 +9,36 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PointOfSale
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import br.com.alura.panucci.sampledata.bottomAppBarItems
+import br.com.alura.panucci.navigation.AppDestination
+import br.com.alura.panucci.navigation.bottomAppBarItems
 import br.com.alura.panucci.sampledata.sampleProducts
 import br.com.alura.panucci.ui.components.BottomAppBarItem
 import br.com.alura.panucci.ui.components.PanucciBottomAppBar
-import br.com.alura.panucci.ui.screens.*
+import br.com.alura.panucci.ui.screens.CheckoutScreen
+import br.com.alura.panucci.ui.screens.DrinksListScreen
+import br.com.alura.panucci.ui.screens.HighlightsListScreen
+import br.com.alura.panucci.ui.screens.MenuListScreen
+import br.com.alura.panucci.ui.screens.ProductDetailsScreen
 import br.com.alura.panucci.ui.theme.PanucciTheme
-import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {
 
@@ -50,7 +64,7 @@ class MainActivity : ComponentActivity() {
                     val selectedItem by remember(currentDestination) {
                         val item = currentDestination?.let { destination ->
                             bottomAppBarItems.find {
-                                it.route == destination.route
+                                it.destination.route == destination.route
                             }
                         } ?: bottomAppBarItems.first()
                         mutableStateOf(item)
@@ -58,55 +72,55 @@ class MainActivity : ComponentActivity() {
                     PanucciApp(
                         bottomAppBarItemSelected = selectedItem,
                         onBottomAppBarItemSelectedChange = {
-                            val route = it.route
+                            val route = it.destination.route
                             navController.navigate(route) {
                                 launchSingleTop = true
                                 popUpTo(route)
                             }
                         },
                         onFabClick = {
-                            navController.navigate("checkout")
+                            navController.navigate(AppDestination.Checkout.route)
                         }) {
                         NavHost(
                             navController = navController,
-                            startDestination = "highlight"
+                            startDestination = AppDestination.HighLight.route
                         ) {
-                            composable("highlight") {
+                            composable(AppDestination.HighLight.route) {
                                 HighlightsListScreen(
                                     products = sampleProducts,
                                     onNavigateToDetails = {
-                                        navController.navigate("productDetails")
+                                        navController.navigate(AppDestination.ProductDetails.route)
                                     },
                                     onNavigateToCheckout = {
-                                        navController.navigate("checkout")
+                                        navController.navigate(AppDestination.Checkout.route)
                                     }
                                 )
                             }
-                            composable("menu") {
+                            composable(AppDestination.Menu.route) {
                                 MenuListScreen(
                                     products = sampleProducts,
                                     onNavigateToDetails = {
-                                        navController.navigate("productDetails")
+                                        navController.navigate(AppDestination.ProductDetails.route)
                                     }
                                 )
                             }
-                            composable("drinks") {
+                            composable(AppDestination.Drinks.route) {
                                 DrinksListScreen(
                                     products = sampleProducts,
                                     onNavigateToDetails = {
-                                        navController.navigate("productDetails")
+                                        navController.navigate(AppDestination.ProductDetails.route)
                                     }
                                 )
                             }
-                            composable("productDetails") {
+                            composable(AppDestination.ProductDetails.route) {
                                 ProductDetailsScreen(
                                     product = sampleProducts.random(),
                                     onNavigateToCheckout = {
-                                        navController.navigate("checkout")
+                                        navController.navigate(AppDestination.Checkout.route)
                                     }
                                 )
                             }
-                            composable("checkout") {
+                            composable(AppDestination.Checkout.route) {
                                 CheckoutScreen(products = sampleProducts)
                             }
                         }

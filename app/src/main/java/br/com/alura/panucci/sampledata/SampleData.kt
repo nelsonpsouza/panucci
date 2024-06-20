@@ -34,21 +34,3 @@ val sampleProducts = List(10) { index ->
         image = if (index % 2 == 0) "https://picsum.photos/1920/1080" else null
     )
 }
-
-val bottomAppBarItems = listOf(
-    BottomAppBarItem(
-        label = "Destaques",
-        icon = Icons.Filled.AutoAwesome,
-        route = "highlight"
-    ),
-    BottomAppBarItem(
-        label = "Menu",
-        icon = Icons.Filled.RestaurantMenu,
-        route = "menu"
-    ),
-    BottomAppBarItem(
-        label = "Bebidas",
-        icon = Icons.Outlined.LocalBar,
-        route = "drinks"
-    ),
-)
