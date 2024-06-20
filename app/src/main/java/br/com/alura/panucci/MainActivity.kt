@@ -47,7 +47,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    var selectedItem by remember(currentDestination) {
+                    val selectedItem by remember(currentDestination) {
                         val item = currentDestination?.let { destination ->
                             bottomAppBarItems.find {
                                 it.route == destination.route
@@ -65,19 +65,49 @@ class MainActivity : ComponentActivity() {
                             }
                         },
                         onFabClick = {
+                            navController.navigate("checkout")
                         }) {
                         NavHost(
                             navController = navController,
                             startDestination = "highlight"
                         ) {
                             composable("highlight") {
-                                HighlightsListScreen(products = sampleProducts)
+                                HighlightsListScreen(
+                                    products = sampleProducts,
+                                    onNavigateToDetails = {
+                                        navController.navigate("productDetails")
+                                    },
+                                    onNavigateToCheckout = {
+                                        navController.navigate("checkout")
+                                    }
+                                )
                             }
                             composable("menu") {
-                                MenuListScreen(products = sampleProducts)
+                                MenuListScreen(
+                                    products = sampleProducts,
+                                    onNavigateToDetails = {
+                                        navController.navigate("productDetails")
+                                    }
+                                )
                             }
                             composable("drinks") {
-                                DrinksListScreen(products = sampleProducts)
+                                DrinksListScreen(
+                                    products = sampleProducts,
+                                    onNavigateToDetails = {
+                                        navController.navigate("productDetails")
+                                    }
+                                )
+                            }
+                            composable("productDetails") {
+                                ProductDetailsScreen(
+                                    product = sampleProducts.random(),
+                                    onNavigateToCheckout = {
+                                        navController.navigate("checkout")
+                                    }
+                                )
+                            }
+                            composable("checkout") {
+                                CheckoutScreen(products = sampleProducts)
                             }
                         }
                     }
