@@ -28,6 +28,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import br.com.alura.panucci.navigation.AppDestination
 import br.com.alura.panucci.navigation.bottomAppBarItems
 import br.com.alura.panucci.sampledata.sampleProducts
@@ -39,6 +40,7 @@ import br.com.alura.panucci.ui.screens.HighlightsListScreen
 import br.com.alura.panucci.ui.screens.MenuListScreen
 import br.com.alura.panucci.ui.screens.ProductDetailsScreen
 import br.com.alura.panucci.ui.theme.PanucciTheme
+import java.math.BigDecimal
 
 class MainActivity : ComponentActivity() {
 
@@ -103,8 +105,9 @@ class MainActivity : ComponentActivity() {
                                 HighlightsListScreen(
                                     products = sampleProducts,
                                     onNavigateToDetails = { product ->
+                                        val promoCode = "ALURA"
                                         navController.navigate(
-                                            "${AppDestination.ProductDetails.route}/${product.id}")
+                                            "${AppDestination.ProductDetails.route}/${product.id}?promoCode=${promoCode}")
                                     },
                                     onNavigateToCheckout = {
                                         navController.navigate(AppDestination.Checkout.route)
@@ -129,16 +132,24 @@ class MainActivity : ComponentActivity() {
                                     },
                                 )
                             }
-                            composable("${AppDestination.ProductDetails.route}/{productId}") {
-                                backStackEntry ->
+                            composable(
+                                route = "${AppDestination.ProductDetails.route}/{productId}?promoCode={promoCode}",
+                                arguments = listOf(navArgument("promoCode") { nullable = true })
+                            ) { backStackEntry ->
                                 val id = backStackEntry.arguments?.getString("productId")
-                                Log.i("MainActivity", "onCreate: productId - $id")
+                                val promoCode = backStackEntry.arguments?.getString("promoCode")
                                 sampleProducts.find { p ->
                                     p.id == id
                                 }?.let { product ->
-                                    Log.i("MainActivity", "onCreate: product - $product")
+                                    val discount = when(promoCode) {
+                                        "ALURA" -> BigDecimal("0.1")
+                                        else -> BigDecimal.ZERO
+                                    }
+
+                                    val currentPrice = product.price
+
                                     ProductDetailsScreen(
-                                        product = product,
+                                        product = product.copy(price = currentPrice - (currentPrice*discount)),
                                         onNavigateToCheckout = {
                                             navController.navigate(AppDestination.Checkout.route)
                                         }
