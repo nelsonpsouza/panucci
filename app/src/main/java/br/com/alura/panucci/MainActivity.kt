@@ -102,8 +102,9 @@ class MainActivity : ComponentActivity() {
                             composable(AppDestination.HighLight.route) {
                                 HighlightsListScreen(
                                     products = sampleProducts,
-                                    onNavigateToDetails = {
-                                        navController.navigate(AppDestination.ProductDetails.route)
+                                    onNavigateToDetails = { product ->
+                                        navController.navigate(
+                                            "${AppDestination.ProductDetails.route}/${product.id}")
                                     },
                                     onNavigateToCheckout = {
                                         navController.navigate(AppDestination.Checkout.route)
@@ -113,26 +114,36 @@ class MainActivity : ComponentActivity() {
                             composable(AppDestination.Menu.route) {
                                 MenuListScreen(
                                     products = sampleProducts,
-                                    onNavigateToDetails = {
-                                        navController.navigate(AppDestination.ProductDetails.route)
-                                    }
+                                    onNavigateToDetails = { product ->
+                                        navController.navigate(
+                                            "${AppDestination.ProductDetails.route}/${product.id}")
+                                    },
                                 )
                             }
                             composable(AppDestination.Drinks.route) {
                                 DrinksListScreen(
                                     products = sampleProducts,
-                                    onNavigateToDetails = {
-                                        navController.navigate(AppDestination.ProductDetails.route)
-                                    }
+                                    onNavigateToDetails = { product ->
+                                        navController.navigate(
+                                            "${AppDestination.ProductDetails.route}/${product.id}")
+                                    },
                                 )
                             }
-                            composable(AppDestination.ProductDetails.route) {
-                                ProductDetailsScreen(
-                                    product = sampleProducts.random(),
-                                    onNavigateToCheckout = {
-                                        navController.navigate(AppDestination.Checkout.route)
-                                    }
-                                )
+                            composable("${AppDestination.ProductDetails.route}/{productId}") {
+                                backStackEntry ->
+                                val id = backStackEntry.arguments?.getString("productId")
+                                Log.i("MainActivity", "onCreate: productId - $id")
+                                sampleProducts.find { p ->
+                                    p.id == id
+                                }?.let { product ->
+                                    Log.i("MainActivity", "onCreate: product - $product")
+                                    ProductDetailsScreen(
+                                        product = product,
+                                        onNavigateToCheckout = {
+                                            navController.navigate(AppDestination.Checkout.route)
+                                        }
+                                    )
+                                }
                             }
                             composable(AppDestination.Checkout.route) {
                                 CheckoutScreen(products = sampleProducts)
