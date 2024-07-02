@@ -7,6 +7,7 @@ import androidx.compose.material.icons.outlined.LocalBar
 import br.com.alura.panucci.ui.components.BottomAppBarItem
 
 sealed class AppDestination(val route: String) {
+    object Authentication : AppDestination("authentication")
     object HighLight : AppDestination("highligth")
     object Menu : AppDestination("menu")
     object Drinks : AppDestination("drinks")
