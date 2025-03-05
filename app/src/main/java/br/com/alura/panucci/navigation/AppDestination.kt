@@ -8,7 +8,7 @@ import br.com.alura.panucci.ui.components.BottomAppBarItem
 
 sealed class AppDestination(val route: String) {
     object Authentication : AppDestination("authentication")
-    object HighLight : AppDestination("highligth")
+    object HighLight : AppDestination("highlights")
     object Menu : AppDestination("menu")
     object Drinks : AppDestination("drinks")
     object ProductDetails : AppDestination("productDetails")

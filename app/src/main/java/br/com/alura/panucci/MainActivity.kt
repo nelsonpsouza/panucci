@@ -39,13 +39,17 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import br.com.alura.panucci.navigation.AppDestination
+import br.com.alura.panucci.navigation.PanucciNavHost
 import br.com.alura.panucci.navigation.bottomAppBarItems
+import br.com.alura.panucci.navigation.navigateToAuthentication
+import br.com.alura.panucci.navigation.navigateToCheckout
 import br.com.alura.panucci.preferences.dataStore
 import br.com.alura.panucci.sampledata.sampleProducts
 import br.com.alura.panucci.ui.components.BottomAppBarItem
@@ -115,7 +119,7 @@ class MainActivity : ComponentActivity() {
                             }
                         },
                         onFabClick = {
-                            navController.navigate(AppDestination.Checkout.route)
+                            navController.navigateToCheckout()
                         },
                         onLogout = {
                             scope.launch {
@@ -123,142 +127,13 @@ class MainActivity : ComponentActivity() {
                                     it.remove(userPreferences)
                                 }
                             }
-                            navController.navigate(AppDestination.Authentication.route) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    inclusive = true
-                                }
-                            }
+                            navController.navigateToAuthentication()
                         },
                         isShowTopBar = containsInBottomAppBarItems,
                         isShowBottomBar = containsInBottomAppBarItems,
                         isShowFab = isShowFab
                     ) {
-                        NavHost(
-                            navController = navController,
-                            startDestination = AppDestination.HighLight.route
-                        ) {
-                            composable(AppDestination.Authentication.route) {
-
-                                val context = LocalContext.current
-                                val scope = rememberCoroutineScope()
-                                AuthenticationScreen(
-                                    onEnterClick = { user ->
-                                        scope.launch {
-                                            context.dataStore.edit {
-                                                it[userPreferences] = user
-                                            }
-                                        }
-                                        navController.navigate(AppDestination.HighLight.route) {
-                                            popUpTo(navController.graph.id)
-                                        }
-                                    }
-                                )
-                            }
-                            composable(AppDestination.HighLight.route) {
-                                val userPreferences = stringPreferencesKey("usuario_logado")
-                                val context = LocalContext.current
-                                var user: String? by remember {
-                                    mutableStateOf(null)
-                                }
-                                var dataState by remember {
-                                    mutableStateOf("loading")
-                                }
-                                LaunchedEffect(null) {
-                                    user = context.dataStore.data.first()[userPreferences]
-                                    dataState = "finished"
-                                }
-                                when (dataState) {
-                                    "loading" -> {
-                                        Box(modifier = Modifier.fillMaxSize()) {
-                                            Text(
-                                                text = "Carregando...",
-                                                Modifier
-                                                    .fillMaxWidth()
-                                                    .align(Alignment.Center),
-                                                textAlign = TextAlign.Center
-                                            )
-                                        }
-                                    }
-
-                                    "finished" -> {
-                                        user?.let {
-                                            HighlightsListScreen(
-                                                products = sampleProducts,
-                                                onNavigateToDetails = { product ->
-                                                    val promoCode = "ALURA"
-                                                    navController.navigate(
-                                                        "${AppDestination.ProductDetails.route}/${product.id}?promoCode=${promoCode}"
-                                                    )
-                                                },
-                                                onNavigateToCheckout = {
-                                                    navController.navigate(AppDestination.Checkout.route)
-                                                }
-                                            )
-                                        } ?: LaunchedEffect(null) {
-                                            navController.navigate(AppDestination.Authentication.route) {
-                                                popUpTo(navController.graph.findStartDestination().id) {
-                                                    inclusive = true
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            composable(AppDestination.Menu.route) {
-                                MenuListScreen(
-                                    products = sampleProducts,
-                                    onNavigateToDetails = { product ->
-                                        navController.navigate(
-                                            "${AppDestination.ProductDetails.route}/${product.id}"
-                                        )
-                                    },
-                                )
-                            }
-                            composable(AppDestination.Drinks.route) {
-                                DrinksListScreen(
-                                    products = sampleProducts,
-                                    onNavigateToDetails = { product ->
-                                        navController.navigate(
-                                            "${AppDestination.ProductDetails.route}/${product.id}"
-                                        )
-                                    },
-                                )
-                            }
-                            composable(
-                                route = "${AppDestination.ProductDetails.route}/{productId}?promoCode={promoCode}",
-                                arguments = listOf(navArgument("promoCode") { nullable = true })
-                            ) { backStackEntry ->
-                                val id = backStackEntry.arguments?.getString("productId")
-                                val promoCode = backStackEntry.arguments?.getString("promoCode")
-                                sampleProducts.find { p ->
-                                    p.id == id
-                                }?.let { product ->
-                                    val discount = when (promoCode) {
-                                        "ALURA" -> BigDecimal("0.1")
-                                        else -> BigDecimal.ZERO
-                                    }
-
-                                    val currentPrice = product.price
-
-                                    ProductDetailsScreen(
-                                        product = product.copy(price = currentPrice - (currentPrice * discount)),
-                                        onNavigateToCheckout = {
-                                            navController.navigate(AppDestination.Checkout.route)
-                                        }
-                                    )
-                                } ?: LaunchedEffect(Unit) {
-                                    navController.navigateUp()
-                                }
-                            }
-                            composable(AppDestination.Checkout.route) {
-                                CheckoutScreen(
-                                    products = sampleProducts,
-                                    onPopBackStack = {
-                                        navController.navigateUp()
-                                    },
-                                )
-                            }
-                        }
+                        PanucciNavHost(navController)
                     }
                 }
             }
