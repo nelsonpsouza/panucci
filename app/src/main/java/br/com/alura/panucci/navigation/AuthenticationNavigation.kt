@@ -17,7 +17,7 @@ private const val USER_PREFERENCES = "user_preferences"
 private val userPreferences = stringPreferencesKey(USER_PREFERENCES)
 
 fun NavGraphBuilder.authenticationScreen(navController: NavHostController) {
-    composable(AppDestination.Authentication.route) {
+    composable(AUTHENTICATION_ROUTE) {
 
         val context = LocalContext.current
         val scope = rememberCoroutineScope()

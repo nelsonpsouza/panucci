@@ -7,7 +7,7 @@ import androidx.navigation.compose.composable
 import br.com.alura.panucci.sampledata.sampleProducts
 import br.com.alura.panucci.ui.screens.DrinksListScreen
 
-private const val DRINKS_ROUTE = "drinks"
+internal const val DRINKS_ROUTE = "drinks"
 
 fun NavGraphBuilder.drinksScreen(navController: NavHostController) {
     composable(route = DRINKS_ROUTE) {

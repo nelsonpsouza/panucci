@@ -7,10 +7,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.PointOfSale
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,43 +26,27 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import br.com.alura.panucci.navigation.AppDestination
+import br.com.alura.panucci.navigation.DRINKS_ROUTE
+import br.com.alura.panucci.navigation.HIGHLIGHTS_LIST_ROUTE
+import br.com.alura.panucci.navigation.MENU_ROUTE
 import br.com.alura.panucci.navigation.PanucciNavHost
 import br.com.alura.panucci.navigation.bottomAppBarItems
 import br.com.alura.panucci.navigation.navigateToAuthentication
 import br.com.alura.panucci.navigation.navigateToCheckout
-import br.com.alura.panucci.preferences.dataStore
-import br.com.alura.panucci.sampledata.sampleProducts
 import br.com.alura.panucci.ui.components.BottomAppBarItem
 import br.com.alura.panucci.ui.components.PanucciBottomAppBar
-import br.com.alura.panucci.ui.screens.AuthenticationScreen
-import br.com.alura.panucci.ui.screens.CheckoutScreen
-import br.com.alura.panucci.ui.screens.DrinksListScreen
-import br.com.alura.panucci.ui.screens.HighlightsListScreen
-import br.com.alura.panucci.ui.screens.MenuListScreen
-import br.com.alura.panucci.ui.screens.ProductDetailsScreen
 import br.com.alura.panucci.ui.theme.PanucciTheme
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.math.BigDecimal
 
 class MainActivity : ComponentActivity() {
     val Context.dataStore: DataStore<Preferences>
@@ -90,29 +73,27 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
+                    val currentRoute = currentDestination?.route
                     val selectedItem by remember(currentDestination) {
-                        val item = currentDestination?.let { destination ->
-                            bottomAppBarItems.find {
-                                it.destination.route == destination.route
-                            }
-                        } ?: bottomAppBarItems.first()
+                        val item = when (currentRoute) {
+                            MENU_ROUTE -> BottomAppBarItem.Menu
+                            DRINKS_ROUTE -> BottomAppBarItem.Drinks
+                            else -> BottomAppBarItem.Highlightslist
+                        }
                         mutableStateOf(item)
                     }
-                    val containsInBottomAppBarItems = currentDestination?.let { destination ->
-                        bottomAppBarItems.find {
-                            it.destination.route == destination.route
-                        }
-                    } != null
-                    val isShowFab = when (currentDestination?.route) {
-                        AppDestination.Menu.route,
-                        AppDestination.Drinks.route -> true
-
+                    val containsInBottomAppBarItems = when (currentRoute) {
+                        MENU_ROUTE, DRINKS_ROUTE, HIGHLIGHTS_LIST_ROUTE -> true
+                        else -> false
+                    }
+                    val isShowFab = when (currentRoute) {
+                        MENU_ROUTE, DRINKS_ROUTE -> true
                         else -> false
                     }
                     PanucciApp(
                         bottomAppBarItemSelected = selectedItem,
                         onBottomAppBarItemSelectedChange = {
-                            val route = it.destination.route
+                            val route = it.destination
                             navController.navigate(route) {
                                 launchSingleTop = true
                                 popUpTo(route)
@@ -163,7 +144,7 @@ fun PanucciApp(
                     actions = {
                         IconButton(onClick = onLogout) {
                             Icon(
-                                Icons.Filled.ExitToApp,
+                                Icons.AutoMirrored.Filled.ExitToApp,
                                 contentDescription = "sair do app"
                             )
                         }
