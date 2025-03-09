@@ -36,16 +36,13 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navOptions
 import br.com.alura.panucci.navigation.DRINKS_ROUTE
 import br.com.alura.panucci.navigation.HIGHLIGHTS_LIST_ROUTE
 import br.com.alura.panucci.navigation.MENU_ROUTE
 import br.com.alura.panucci.navigation.PanucciNavHost
 import br.com.alura.panucci.navigation.navigateToAuthentication
 import br.com.alura.panucci.navigation.navigateToCheckout
-import br.com.alura.panucci.navigation.navigateToDrinks
-import br.com.alura.panucci.navigation.navigateToHighlightsList
-import br.com.alura.panucci.navigation.navigateToMenu
+import br.com.alura.panucci.navigation.navigateWithSingleTopAndPopUpTo
 import br.com.alura.panucci.ui.components.BottomAppBarItem
 import br.com.alura.panucci.ui.components.PanucciBottomAppBar
 import br.com.alura.panucci.ui.components.bottomAppBarItems
@@ -97,27 +94,7 @@ class MainActivity : ComponentActivity() {
                     PanucciApp(
                         bottomAppBarItemSelected = selectedItem,
                         onBottomAppBarItemSelectedChange = { item ->
-                            val (route, navigate) = when (item) {
-                                BottomAppBarItem.Menu -> Pair(
-                                    MENU_ROUTE,
-                                    navController::navigateToMenu
-                                )
-                                BottomAppBarItem.Drinks -> Pair(
-                                    DRINKS_ROUTE,
-                                    navController::navigateToDrinks
-                                )
-                                BottomAppBarItem.Highlightslist -> Pair(
-                                    HIGHLIGHTS_LIST_ROUTE,
-                                    navController::navigateToHighlightsList
-                                )
-                            }
-
-                            val navOptions = navOptions {
-                                launchSingleTop = true
-                                popUpTo(route)
-                            }
-
-                            navigate(navOptions)
+                            navController.navigateWithSingleTopAndPopUpTo(item)
                         },
                         onFabClick = {
                             navController.navigateToCheckout()
